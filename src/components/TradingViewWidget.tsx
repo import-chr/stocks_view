@@ -1,4 +1,3 @@
-// TradingViewWidget.jsx
 'use client'
 
 import useTradingViewWidget from '@/hooks/useTradingViewWidget';
