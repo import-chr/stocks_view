@@ -11,11 +11,11 @@ export const transporter = nodemailer.createTransport({
 
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
   const httpTemplate = WELCOME_EMAIL_TEMPLATE
-    .replace('{{name}}', name)
-    .replace('{{intro}}', intro);
+    .replaceAll('{{name}}', name)
+    .replaceAll('{{intro}}', intro);
   
   const mailOptions = {
-    from: 'Stox',
+    from: `Stox <${process.env.NODEMAILER_EMAIL}>`,
     to: email,
     subject: `Welcome to Stox - your stock market toolkit is ready!`,
     text: 'Thanks for joining Stox',
