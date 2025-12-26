@@ -1,12 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Controller,
-  type Control,
-  type FieldError,
   type FieldValues,
-  type FieldPath,
 } from 'react-hook-form'
 import { Label } from '@/components/ui/label'
 import {
@@ -23,12 +20,13 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import countryList from 'react-select-country-list'
 
-type CountrySelectProps<TFieldValues extends FieldValues> = {
-  name: FieldPath<TFieldValues>
-  label: string
-  control: Control<TFieldValues>
-  error?: FieldError
-  required?: boolean
+const getFlagEmoji = (countryCode: string) => {
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map((char) => 127397 + char.charCodeAt(0))
+
+  return String.fromCodePoint(...codePoints)
 }
 
 const CountrySelect = ({
@@ -39,16 +37,7 @@ const CountrySelect = ({
   onChange: (value: string) => void
 }) => {
   const [open, setOpen] = useState(false)
-  const countries = countryList().getData()
-
-  const getFlagEmoji = (countryCode: string) => {
-    const codePoints = countryCode
-      .toUpperCase()
-      .split('')
-      .map((char) => 127397 + char.charCodeAt(0))
-
-    return String.fromCodePoint(...codePoints)
-  }
+  const countries = useMemo(() => countryList().getData(), [])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
