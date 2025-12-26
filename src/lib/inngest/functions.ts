@@ -13,7 +13,7 @@ export const sendSignUpEmail = inngest.createFunction(
       - Preferred industry: ${event.data.preferredIndustry}
     `
 
-    const prompt = PERSONALIZED_WELCOME_EMAIL_PROMPT.replace('{{usaerProfile}}', userProfile);
+    const prompt = PERSONALIZED_WELCOME_EMAIL_PROMPT.replace('{{userProfile}}', userProfile);
     const response = await step.ai.infer('generate-welcome-intro', {
       model: step.ai.models.gemini({ model: 'gemini-2.5-flash-lite' }),
       body: {
@@ -33,7 +33,12 @@ export const sendSignUpEmail = inngest.createFunction(
       const introText = (part && 'text' in part ? part.text : null) || 'Thanks for joining Stox. Now you have the tools to track markets and make smarter moves.';
       const { data: {email, name } } = event;
 
-      return await sendWelcomeEmail({ email, name, intro: introText })
+      try {
+       return await sendWelcomeEmail({ email, name, intro: introText });
+     } catch (error) {
+       console.error('Failed to send welcome email', { email, error });
+       throw error;
+     }
     });
 
     return {
