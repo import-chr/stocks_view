@@ -14,12 +14,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut } from "lucide-react"
 import Navitems from "@/components/Navitems"
 import { signOut } from "@/lib/actions/auth.actions"
+import { toast } from "sonner"
 
 const UserDropdown = ({ user }: { user: User }) => {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut();
+    const result = await signOut();
+
+    if(!result?.success) {
+      toast.error("Sign out failed");
+      return;
+    }
+
     router.push("/sign-in");
   }
 
