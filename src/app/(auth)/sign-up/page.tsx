@@ -46,7 +46,7 @@ const SignUp = () => {
           placeholder="John Doe"
           register={register}
           error={errors.fullName}
-          validation={{ required: 'Full name is required', minLenght: 2 }}
+          validation={{ required: 'Full name is required', minLength: { value: 2, message: 'Full name must be at least 2 character' } }}
         />
 
         <InputField
@@ -56,7 +56,7 @@ const SignUp = () => {
             type="email"
             register={register}
             error={errors.email}
-            validation={{ required: 'Email is required', pattern: /^\w+@\w+\.\w+$/, message: 'Email address is required' }}
+            validation={{ required: 'Email is required', pattern: { value: /^\w+@\w+\.\w+$/, message: 'Email address is required' } }}
         />
 
         <InputField 
@@ -66,7 +66,7 @@ const SignUp = () => {
           type="password"
           register={register}
           error={errors.password}
-          validation={{ required: 'Password is required', minLenght: 8 }}
+          validation={{ required: 'Password is required', minLength: { value: 8, message: 'Password must be at least 8 character' } }}
         />
 
         <CountrySelectField
@@ -99,7 +99,7 @@ const SignUp = () => {
 
         <SelectField
           name="preferredIndustry"
-          label="Preferred Indsutry"
+          label="Preferred Industry"
           placeholder="Select your preferred industry"
           options={PREFERRED_INDUSTRIES}
           control={control}
@@ -111,7 +111,7 @@ const SignUp = () => {
           {isSubmitting ? 'Creating Account': 'Start Your Investing Journey'}
         </Button>
 
-        <FooterLink text="Already have an account?" linkText="Sing In" href="/sign-in"/>
+        <FooterLink text="Already have an account?" linkText="Sign In" href="/sign-in"/>
       </form>
     </>
   )
