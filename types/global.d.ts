@@ -82,6 +82,11 @@ declare global {
         email: string;
     };
 
+    type UserForNewsEmail = {
+        email: string;
+        name?: string
+    };
+
     type Stock = {
         symbol: string;
         name: string;
@@ -103,6 +108,21 @@ declare global {
     type FinnhubSearchResponse = {
         count: number;
         result: FinnhubSearchResult[];
+    };
+
+    type FinnhubCompanyProfile2 = {
+        country?: string;
+        currency?: string;
+        exchange?: string;
+        name?: string;
+        ticker?: string;
+        ipo?: string;
+        marketCapitalization?: number;
+        shareOutstanding?: number;
+        logo?: string;
+        phone?: string;
+        weburl?: string;
+        finnhubIndustry?: string;
     };
 
     type StockDetailsPageProps = {
