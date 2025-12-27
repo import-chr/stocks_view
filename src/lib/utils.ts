@@ -38,14 +38,14 @@ export function formatMarketCapValue(marketCapUsd: number): string {
 export function normalizeExchangeLabel(raw?: string): string {
   const s = (raw ?? '').toUpperCase();
 
-  if (!s) return 'US';
+  if (!s || !raw) return 'US';
 
   if (s.includes('NASDAQ')) return 'NASDAQ';
   if (s.includes('NEW YORK STOCK EXCHANGE') || s === 'NYSE' || s.includes('NYSE')) return 'NYSE';
   if (s.includes('AMEX') || s.includes('NYSE AMERICAN')) return 'AMEX';
   if (s.includes('OTC')) return 'OTC';
 
-  return raw!;
+  return raw;
 }
 
 export const getDateRange = (days: number) => {
@@ -87,7 +87,7 @@ export const calculateNewsDistribution = (symbolsCount: number) => {
 
 // Check for required article fields
 export const validateArticle = (article: RawNewsArticle) =>
-    article.headline && article.summary && article.url && article.datetime;
+    !!(article.headline && article.summary && article.url && article.datetime);
 
 // Get today's date string in YYYY-MM-DD format
 export const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -111,13 +111,14 @@ export const formatArticle = (
 });
 
 export const formatChangePercent = (changePercent?: number) => {
-  if (!changePercent) return '';
+  if (changePercent === undefined || changePercent === null) return '';
   const sign = changePercent > 0 ? '+' : '';
   return `${sign}${changePercent.toFixed(2)}%`;
 };
 
 export const getChangeColorClass = (changePercent?: number) => {
-  if (!changePercent) return 'text-gray-400';
+  if (changePercent === undefined || changePercent === null) return 'text-gray-400';
+  if (changePercent === 0) return 'text-gray-400';
   return changePercent > 0 ? 'text-green-500' : 'text-red-500';
 };
 
@@ -128,15 +129,6 @@ export const formatPrice = (price: number) => {
     minimumFractionDigits: 2,
   }).format(price);
 };
-
-export const formatDateToday = new Date().toLocaleDateString('en-US', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  timeZone: 'UTC',
-});
-
 
 export const getAlertText = (alert: Alert) => {
   const condition = alert.alertType === 'upper' ? '>' : '<';
