@@ -84,7 +84,7 @@ declare global {
 
     type UserForNewsEmail = {
         email: string;
-        name?: string
+        name?: string;
     };
 
     type Stock = {
