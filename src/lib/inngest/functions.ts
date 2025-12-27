@@ -88,10 +88,12 @@ export const sendDailyNewsSummary = inngest.createFunction(
     const userNewsSummaries: { user: UserForNewsEmail; newsContent: string | null }[] = [];
 
     for (const { user, articles } of results) {
-      try {
-        const prompt = NEWS_SUMMARY_EMAIL_PROMPT.replace('{{newsData}}', JSON.stringify(articles, null, 2));
-
-        const response = await step.ai.infer(`summarize-news-${user.email}`, {
+      const newsContent = await step.run(`summarize-news-${user.email}`, async () => {
+        if (articles.length === 0) return null;
+        
+        try {
+          const prompt = NEWS_SUMMARY_EMAIL_PROMPT.replace('{{newsData}}', JSON.stringify(articles, null, 2));
+          const response = await step.ai.infer(`ai-summarize-${user.email}`, {
           model: step.ai.models.gemini({ model: 'gemini-2.5-flash-lite' }),
           body: {
             contents: [{ role: 'user', parts: [{ text:prompt }]}]
@@ -99,25 +101,37 @@ export const sendDailyNewsSummary = inngest.createFunction(
         });
 
         const part = response.candidates?.[0]?.content?.parts?.[0];
-        const newsContent = (part && 'text' in part ? part.text : null) || 'No market news.'
-
-        userNewsSummaries.push({ user, newsContent });
-      } catch (e) {
-        console.error('Failed to summarize news for : ', user.email, e);
-        userNewsSummaries.push({ user, newsContent: null });
-      }
+          return (part && 'text' in part ? part.text : null) || 'No market news.';
+        } catch (e) {
+          console.error('Failed to summarize news for:', user.email, e);
+          return null;
+        }
+      });
+      
+      userNewsSummaries.push({ user, newsContent });
     }
 
     // Step #4: (placeholder) Send the emails
     await step.run('send-news-emails', async () => {
-      await Promise.all(
+      const results = await Promise.allSettled(
         userNewsSummaries.map(async ({ user, newsContent}) => {
           if(!newsContent) return false;
 
-          return await sendNewsSummaryEmail({ email: user.email, date: getFormattedTodayDate(), newsContent })
+          try {
+            await sendNewsSummaryEmail({ email: user.email, date: getFormattedTodayDate(), newsContent });
+            return true;
+          } catch (e) {
+            console.error('Failed to send news email to:', user.email, e);
+            return false;
+          }
         })
-      )
-    })
+      );
+
+      const failed = results.filter(r => r.status === 'rejected').length;
+      if (failed > 0) {
+        console.warn(`${failed} news emails failed to send`);
+      }
+    });
 
     return { success: true, message: 'Daily news summary emails sent successfully' }
   }
