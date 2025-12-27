@@ -5,7 +5,6 @@ import { POPULAR_STOCK_SYMBOLS } from '@/lib/constants';
 import { cache } from 'react';
 
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
-const NEXT_PUBLIC_FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? '';
 
 async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T> {
   const options: RequestInit & { next?: { revalidate?: number } } = revalidateSeconds
@@ -98,8 +97,7 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
   try {
     const token = process.env.FINNHUB_API_KEY ?? process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? '';
     if (!token) {
-      console.error('Error in stock search:', new Error('FINNHUB API key is not configured'));
-      return [];
+      throw new Error('FINNHUB API key is not configured');
     }
 
     const trimmed = typeof query === 'string' ? query.trim() : '';
