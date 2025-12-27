@@ -18,7 +18,7 @@ export const transporter = nodemailer.createTransport({
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
   validateEmailConfig();
 
-  const httpTemplate = WELCOME_EMAIL_TEMPLATE
+  const htmlTemplate = WELCOME_EMAIL_TEMPLATE
     .replaceAll('{{name}}', name)
     .replaceAll('{{intro}}', intro);
   
@@ -27,7 +27,7 @@ export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData)
     to: email,
     subject: `Welcome to Stox - your stock market toolkit is ready!`,
     text: 'Thanks for joining Stox',
-    html: httpTemplate,  
+    html: htmlTemplate,  
   }
 
   await transporter.sendMail(mailOptions);
