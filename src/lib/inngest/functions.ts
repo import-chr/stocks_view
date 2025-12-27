@@ -127,7 +127,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
         })
       );
 
-      const failed = results.filter(r => r.status === 'rejected').length;
+      const failed = results.filter(r => r.status === 'fulfilled' && r.value === false).length;
       if (failed > 0) {
         console.warn(`${failed} news emails failed to send`);
       }
