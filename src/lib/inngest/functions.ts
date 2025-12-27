@@ -85,10 +85,9 @@ export const sendDailyNewsSummary = inngest.createFunction(
     });
     
     // Step #3: (placeholder) Summarize news via AI
-    const userNewsSummaries: { user: UserForNewsEmail; newsContent: string | null }[] = [];
-
-    for (const { user, articles } of results) {
-      const newsContent = await step.run(`summarize-news-${user.email}`, async () => {
+    const userNewsSummaries = await Promise.all(
+      results.map(async ({ user, articles }) => {
+        const newsContent = await step.run(`summarize-news-${user.email}`, async () => {
         if (articles.length === 0) return null;
         
         try {
@@ -108,8 +107,9 @@ export const sendDailyNewsSummary = inngest.createFunction(
         }
       });
       
-      userNewsSummaries.push({ user, newsContent });
-    }
+      return { user, newsContent };
+      })
+    );
 
     // Step #4: (placeholder) Send the emails
     await step.run('send-news-emails', async () => {
