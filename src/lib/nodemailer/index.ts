@@ -1,9 +1,11 @@
 import nodemailer from "nodemailer"
 import { WELCOME_EMAIL_TEMPLATE, NEWS_SUMMARY_EMAIL_TEMPLATE } from "./templates";
 
-if (!process.env.NODEMAILER_EMAIL || !process.env.NODEMAILER_PASSWORD) {
-  throw new Error('NODEMAILER_EMAIL and NODEMAILER_PASSWORD environment variables are required');
-}
+const validateEmailConfig = () => {
+  if (!process.env.NODEMAILER_EMAIL || !process.env.NODEMAILER_PASSWORD) {
+    throw new Error('NODEMAILER_EMAIL and NODEMAILER_PASSWORD environment variables are required');
+  }
+};
 
 export const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -14,6 +16,8 @@ export const transporter = nodemailer.createTransport({
 });
 
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
+  validateEmailConfig();
+
   const httpTemplate = WELCOME_EMAIL_TEMPLATE
     .replaceAll('{{name}}', name)
     .replaceAll('{{intro}}', intro);
@@ -32,6 +36,8 @@ export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData)
 export const sendNewsSummaryEmail = async (
   { email, date, newsContent }: { email: string; date: string; newsContent: string }
 ): Promise<void> => {
+  validateEmailConfig();
+
   const htmlTemplate = NEWS_SUMMARY_EMAIL_TEMPLATE
     .replace('{{date}}', date)
     .replace('{{newsContent}}', newsContent);
@@ -40,7 +46,7 @@ export const sendNewsSummaryEmail = async (
     from: `"Stox News" <${process.env.NODEMAILER_EMAIL}>`,
     to: email,
     subject: `📈 Market News Summary Today - ${date}`,
-    text: `Today's market news summary from Signalist`,
+    text: `Today's market news summary from Stox`,
     html: htmlTemplate,
   };
 
