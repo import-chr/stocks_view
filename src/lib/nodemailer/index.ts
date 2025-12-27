@@ -1,5 +1,11 @@
 import nodemailer from "nodemailer"
-import { WELCOME_EMAIL_TEMPLATE } from "./templates";
+import { WELCOME_EMAIL_TEMPLATE, NEWS_SUMMARY_EMAIL_TEMPLATE } from "./templates";
+
+const validateEmailConfig = () => {
+  if (!process.env.NODEMAILER_EMAIL || !process.env.NODEMAILER_PASSWORD) {
+    throw new Error('NODEMAILER_EMAIL and NODEMAILER_PASSWORD environment variables are required');
+  }
+};
 
 export const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -10,17 +16,39 @@ export const transporter = nodemailer.createTransport({
 });
 
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
-  const httpTemplate = WELCOME_EMAIL_TEMPLATE
+  validateEmailConfig();
+
+  const htmlTemplate = WELCOME_EMAIL_TEMPLATE
     .replaceAll('{{name}}', name)
     .replaceAll('{{intro}}', intro);
   
   const mailOptions = {
-    from: `Stox <${process.env.NODEMAILER_EMAIL}>`,
+    from: `"Stox" <${process.env.NODEMAILER_EMAIL}>`,
     to: email,
     subject: `Welcome to Stox - your stock market toolkit is ready!`,
     text: 'Thanks for joining Stox',
-    html: httpTemplate,  
+    html: htmlTemplate,  
   }
 
   await transporter.sendMail(mailOptions);
 }
+
+export const sendNewsSummaryEmail = async (
+  { email, date, newsContent }: { email: string; date: string; newsContent: string }
+): Promise<void> => {
+  validateEmailConfig();
+
+  const htmlTemplate = NEWS_SUMMARY_EMAIL_TEMPLATE
+    .replace('{{date}}', date)
+    .replace('{{newsContent}}', newsContent);
+
+  const mailOptions = {
+    from: `"Stox News" <${process.env.NODEMAILER_EMAIL}>`,
+    to: email,
+    subject: `📈 Market News Summary Today - ${date}`,
+    text: `Today's market news summary from Stox`,
+    html: htmlTemplate,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
