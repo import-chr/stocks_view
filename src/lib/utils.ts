@@ -100,29 +100,14 @@ export const formatArticle = (
 ) => ({
   id: isCompanyNews ? Date.now() + Math.random() : article.id + index,
   headline: article.headline!.trim(),
-function truncateAtWord(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  const truncated = text.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  return (lastSpace > maxLength * 0.8 ? truncated.substring(0, lastSpace) : truncated) + '...';
-}
-
-export const formatArticle = (
-    article: RawNewsArticle,
-    isCompanyNews: boolean,
-    symbol?: string,
-    index: number = 0
-) => ({
-  id: isCompanyNews ? Date.now() + Math.random() : article.id + index,
-  headline: article.headline!.trim(),
-  summary: truncateAtWord(article.summary!.trim(), isCompanyNews ? 200 : 150),
-  source: article.source || (isCompanyNews ? 'Company News' : 'Market News'),
+  summary:
+      article.summary!.trim().substring(0, isCompanyNews ? 200 : 150) + '...',
   source: article.source || (isCompanyNews ? 'Company News' : 'Market News'),
   url: article.url!,
   datetime: article.datetime!,
   image: article.image || '',
   category: isCompanyNews ? 'company' : article.category || 'general',
-  related: isCompanyNews ? (symbol ?? '') : article.related || '',
+  related: isCompanyNews ? symbol! : article.related || '',
 });
 
 export const formatChangePercent = (changePercent?: number) => {
